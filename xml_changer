@@ -1,11 +1,40 @@
 #! /bin/bash
 
+# use -n option to create new files
+if (( $# != 0 ))  && test $1 == "-n"
+then 
+	echo initializing files 
+	
+	touch file{0..9}.xml	
+	for f in *.xml
+	do 
+		# using awk to initalize files for testing reasons
+        	awk -F: '{ print $5 }' /etc/passwd | sed 's/^$/@@@/' > $f
+	done
+
+	echo files initialised
+fi
+
+count=$(ls *.xml 2>/dev/null | wc -l)
+# echo $count
+
+if [ "$count" -lt 1 ];
+then 
+	echo no files found
+	exit 1
+fi
+
+echo changing all xml files
 for f in file*.xml
 do
 	echo $f
 	mv $f $f.old
-	awk -F: '{ print $5 }' /etc/passwd | sed 's/^$/@@@/' > $f
-       	
+	
+       	sed 's/Server/This is my test server/' < $f > $f.old
+	
+	cat $f.old > $f
+	rm $f.old
+
 	if test $? -eq 0
 	then 
 		echo file $f changed 
@@ -14,5 +43,5 @@ do
 		exit 1 
 	fi	
 done
-
 echo success
+exit 0

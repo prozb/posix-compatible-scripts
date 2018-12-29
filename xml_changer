@@ -1,10 +1,10 @@
 #! /bin/bash
 
+# use -d option to remove all xml files
 # use -n option to create new files
 if (( $# != 0 ))  && test $1 == "-n"
 then 
 	echo initializing files 
-	
 	touch file{0..9}.xml	
 	for f in *.xml
 	do 
@@ -13,6 +13,13 @@ then
 	done
 
 	echo files initialised
+fi
+
+if (( $# != 0)) && test $1 == "-d"
+then 
+	echo removing all xml files
+	rm *.xml 2>/dev/null
+	exit 0
 fi
 
 count=$(ls *.xml 2>/dev/null | wc -l)

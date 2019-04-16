@@ -5,11 +5,6 @@
 
  # reading file and processing line by line
 
-PREV_LINE=
-CURRENT_LINE=
-COUNT_LINE=
-N_OPTION=0
-
 file="file"
 
 if [ ! -s ${file} ]; then
@@ -19,9 +14,16 @@ fi
 
 {
     IFS= read -r PREV_LINE
-    while IFS= read -r CURRENT_LINE; do
-        echo "${PREV_LINE} and ${CURRENT_LINE} \n"
+    printf "%s\n" ${PREV_LINE}
 
+    while IFS= read -r CURRENT_LINE; do
+        # checking lines equal
+        if [ "X${PREV_LINE}" = "X${CURRENT_LINE}" ]; then
+            printf ""
+            # processing counter
+        else
+            printf "%s\n" ${CURRENT_LINE}
+        fi
 
         PREV_LINE=${CURRENT_LINE}
     done

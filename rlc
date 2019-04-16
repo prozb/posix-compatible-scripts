@@ -1,0 +1,70 @@
+#! /bin/sh
+
+HELP_MESSAGE="Help: correct program usage: rlc [-c NUM] [-n] file1 [file2 ...]"
+GET_OPT_TEMPLATE=":c:n"
+C_OPTION=0
+N_OPTION=0
+NUM_VALUE=
+# parsing options 
+while getopts "${GET_OPT_TEMPLATE}" option;
+do 
+    case ${option} in
+        c ) 
+            NUM_VALUE=$OPTARG
+            C_OPTION=1
+            ;;
+        n )
+            N_OPTION=1
+            ;;
+        \? )
+            echo "$HELP_MESSAGE"
+            ;;
+    esac
+done
+
+# shifting processed options 
+shift $((OPTIND - 1))
+
+# checking file names
+if [ $# -lt 1 ];
+then 
+    echo "Error: program should be called with at least one file name"
+    exit 0
+fi
+
+# iterating files
+for file in "$@";
+do 
+    echo "============================================="
+    # check file exist
+    if [ ! -f "$file" ];
+    then 
+        echo "Error: cannot find \"$file\", skipping. "
+        continue 
+    fi
+
+    # process file
+    echo "File: $file"
+    if [ $C_OPTION -ne 1 ] && [ $N_OPTION -ne 1 ];
+    then
+        uniq "$file"
+    elif [ $N_OPTION -eq 1 ] && [ $C_OPTION -eq 1 ]
+    then   
+        # checking num value
+        if [ "$NUM_VALUE" -lt 1 ];
+        then
+            echo "-c option should be greater than zero! Skipping"
+            continue
+        fi
+
+        #handle when zero occurrences
+        if uniq -c "$file" | grep -- "$NUM_VALUE\ "
+        then 
+            echo "No line in file \"$file\" is repeated $NUM_VALUE times"
+        fi
+    elif [ $N_OPTION -eq 1 ];
+    then
+        uniq -c "$file"
+    fi
+done
+ echo "============================================="

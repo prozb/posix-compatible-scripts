@@ -4,7 +4,10 @@
 # uniq file 
 
  # reading file and processing line by line
-
+C_OPTION=0
+N_OPTION=1
+NUM_VALUE=
+LINES_COUNTER=1
 file="file"
 
 if [ ! -s ${file} ]; then
@@ -14,15 +17,23 @@ fi
 
 {
     IFS= read -r PREV_LINE
-    printf "%s\n" ${PREV_LINE}
+    # printf "%s\n" ${PREV_LINE}
 
     while IFS= read -r CURRENT_LINE; do
         # checking lines equal
         if [ "X${PREV_LINE}" = "X${CURRENT_LINE}" ]; then
-            printf ""
-            # processing counter
+            # processing counter option
+            if [ ${N_OPTION} -eq 1 ]; then
+                # one more equal line
+                LINES_COUNTER=$(( LINES_COUNTER + 1 ))
+            fi
         else
-            printf "%s\n" ${CURRENT_LINE}
+            # print for counter option
+            if [ ${N_OPTION} -eq 1 ]; then
+                printf "%d %s\n" ${LINES_COUNTER} ${PREV_LINE}
+                LINES_COUNTER=1
+            fi
+            # reset counter
         fi
 
         PREV_LINE=${CURRENT_LINE}

@@ -18,8 +18,8 @@ LINES_COUNTER=1
 # $1 is filename
 # returns zero if file is empty 
 check_file_empty () {
-    if [ ! -s $1 ]; then
-        printf "Error: file \"$1\" is empty!\n" >&2  
+    if [ ! -s "$1" ]; then
+        printf "Error: file \"%s\" is empty!\n" "$1" >&2  
         return 255
     fi  
 
@@ -69,21 +69,21 @@ check_which_option_set () {
 # $1 - line to print
 print_line_both_opts () {
     if [ ${LINES_COUNTER} -eq ${NUM_VALUE} ]; then
-        printf "%d %s\n" ${LINES_COUNTER} $1
+        printf "%d %s\n" ${LINES_COUNTER} "$1"
     fi
 }
 
 # printing line for n option
 # $1 - line to print
 print_line_n_opt () {
-    printf "%d %s\n" ${LINES_COUNTER} $1
+    printf "%d %s\n" ${LINES_COUNTER} "$1"
 }
 
 # printing line for c option
 # $1 - line to print
 print_line_c_opt () {
     if [ ${LINES_COUNTER} -eq ${NUM_VALUE} ]; then
-        printf "%s\n" $1
+        printf "%s\n" "$1"
     fi
 }
 
@@ -117,10 +117,10 @@ process_file () {
 
         IFS= read -r PREV_LINE
         while IFS= read -r CURRENT_LINE; do
-            check_equal_lines ${PREV_LINE} ${CURRENT_LINE}
+            check_equal_lines "${PREV_LINE}" "${CURRENT_LINE}"
 
             if [ $? -eq 1 ]; then
-                print_line ${PREV_LINE}
+                print_line "${PREV_LINE}"
                 LINES_COUNTER=1
             else    
                 LINES_COUNTER=$(( LINES_COUNTER + 1 ))
@@ -129,17 +129,17 @@ process_file () {
             PREV_LINE=$CURRENT_LINE
         done
 
-        check_equal_lines ${PREV_LINE} ${CURRENT_LINE}
+        check_equal_lines "${PREV_LINE}" "${CURRENT_LINE}"
         if [ $? -eq 1 ]; then
-            print_line ${PREV_LINE}
+            print_line "${PREV_LINE}"
             LINES_COUNTER=1
-            print_line ${CURRENT_LINE}
+            print_line "${CURRENT_LINE}"
         else    
             LINES_COUNTER=$(( LINES_COUNTER + 1 ))
-            print_line ${CURRENT_LINE}
+            print_line "${CURRENT_LINE}"
         fi
 
-    } < $1
+    } < "$1"
 }
 # ============== END FUNCTIONS ================= #
 
@@ -150,10 +150,10 @@ do
         c ) 
             NUM_VALUE=$OPTARG
 
-            check_number ${NUM_VALUE}
+            check_number "${NUM_VALUE}"
             if [ ! $? -eq 0 ]; then
-                printf "Error: %s is not number! Check how to use script\n" ${NUM_VALUE} >&2
-                printf "${HELP_MESSAGE}\n"
+                printf "Error: %s is not number! Check how to use script\n" "${NUM_VALUE}" >&2
+                printf "%s \n" "${HELP_MESSAGE}"
                 exit 255
             fi
 
@@ -163,11 +163,11 @@ do
             N_OPTION=1
             ;;
         h ) 
-            printf "${HELP_MESSAGE} \n"
+            printf "%s \n" "${HELP_MESSAGE}"
             exit 0
             ;;
         \? )
-            printf "${HELP_MESSAGE} \n"
+            printf "%s \n" "${HELP_MESSAGE}"
             exit 0
             ;;
     esac
@@ -188,13 +188,13 @@ printf "%s\n" "starting script:"
 printf "%s\n" "--------------------------"
 for file in "$@";
 do 
-    check_file_empty ${file}
+    check_file_empty "${file}"
 
     if [ $? -eq 0 ]; then
-        printf "Processing file \"%s\"\n" ${file}
+        printf "Processing file \"%s\"\n" "${file}"
         printf "%s\n" "--------------------------"
 
-        process_file ${file}
+        process_file "${file}"
         printf "%s\n" "--------------------------"
     fi
 done

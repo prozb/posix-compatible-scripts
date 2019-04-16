@@ -1,0 +1,28 @@
+#! /bin/sh
+
+# emulating uniq command 
+# uniq file 
+
+ # reading file and processing line by line
+
+PREV_LINE=
+CURRENT_LINE=
+COUNT_LINE=
+N_OPTION=0
+
+file="file"
+
+if [ ! -s ${file} ]; then
+    printf "Error: file \"${file}\" is empty!" >&2  
+    exit 1
+fi
+
+{
+    IFS= read -r PREV_LINE
+    while IFS= read -r CURRENT_LINE; do
+        echo "${PREV_LINE} and ${CURRENT_LINE} \n"
+
+
+        PREV_LINE=${CURRENT_LINE}
+    done
+} < ${file}

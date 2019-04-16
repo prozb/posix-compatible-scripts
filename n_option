@@ -5,31 +5,12 @@
 #     date  : 16.04.2019          #
 # #################################
 
-C_OPTION=0
-N_OPTION=1
-NUM_VALUE=
+C_OPTION=1
+N_OPTION=0
+NUM_VALUE=1
 LINES_COUNTER=1
 
 file="file"
-
-# processing options and printing $1 - current line for each option
-process_options () {
-    if [ ${N_OPTION} -eq 1 ] && [ ${C_OPTION} -eq 1 ]; then
-        LINES_COUNTER=$(( LINES_COUNTER + 1 ))
-
-        if [ ${LINES_COUNTER} -eq ${NUM_VALUE} ]; then
-            printf "%d %s\n" ${LINES_COUNTER} $1
-        fi
-    elif [ ${N_OPTION} -eq 1 ]; then 
-        printf "%d %s\n" ${LINES_COUNTER} $1
-    elif [ ${C_OPTION} -eq 1 ]; then
-        if [ ${LINES_COUNTER} -eq ${NUM_VALUE} ]; then
-            printf "%s\n" $1
-        fi
-    else
-        printf "%s\n" $1
-    fi
-}
 
 check_file_empty () {
     if [ ! -s $1 ]; then
@@ -38,53 +19,110 @@ check_file_empty () {
     fi  
 }
 
+# $1 is previous line 
+# $2 is current line
+#
+# returns 0 if equal and 1 if not 
+check_equal_lines () {
+    if [ "X$1" = "X$2" ]; then
+        # LINES_COUNTER=$(( LINES_COUNTER + 1 ))
 
-if [ ! -s ${file} ]; then
-    printf "Error: file \"${file}\" is empty!" >&2  
-    exit 1
-fi
+        return 0
+    else
+        # LINES_COUNTER=1
+
+        return 1
+    fi
+}
+
+# checking which options are set
+# return values: 
+# 1   - both options set 
+# 2   - c option set 
+# 3   - n option set 
+# 255 - no option set 
+check_which_option_set () {
+    if [ ${N_OPTION} -eq 1 ] && [ ${C_OPTION} -eq 1 ]; then
+        return 1
+    elif [ ${C_OPTION} -eq 1 ]; then
+        return 2
+    elif [ ${N_OPTION} -eq 1 ]; then
+        return 3
+    else
+        return 4
+    fi
+}
+
+# printing line for both options
+# $1 - line to print
+print_line_both_opts () {
+    if [ ${LINES_COUNTER} -eq ${NUM_VALUE} ]; then
+        printf "%d %s\n" ${LINES_COUNTER} $1
+    fi
+}
+
+# printing line for n option
+# $1 - line to print
+print_line_n_opt () {
+    # echo "${LINES_COUNTER}"
+    printf "%d %s\n" ${LINES_COUNTER} $1
+}
+
+# printing line for c option
+# $1 - line to print
+print_line_c_opt () {
+    if [ ${LINES_COUNTER} -eq ${NUM_VALUE} ]; then
+        printf "%s\n" $1
+    fi
+}
+
+# $1 line to print
+print_line () {
+    check_which_option_set
+
+    case "$?" in
+        1)
+            print_line_both_opts "$1"
+            ;;
+        2) 
+            print_line_c_opt "$1"
+            ;;
+        3) 
+            print_line_n_opt "$1"
+            ;;
+        4) 
+            printf "%s\n" "$1"
+            ;;
+    esac
+}
 
 # startig script
 {
     PREV_LINE=
     CURRENT_LINE=
-    FUTURE_LINE=
 
-    IFS= read -r CURRENT_LINE
-    while true; do
+    IFS= read -r PREV_LINE
+    while IFS= read -r CURRENT_LINE; do
+        check_equal_lines ${PREV_LINE} ${CURRENT_LINE}
 
-        IFS= read -r FUTURE_LINE
-        # checking  EOF
-        if [ ! $? -eq 0 ]; then
-            if [ "X${PREV_LINE}" = "X${CURRENT_LINE}" ]; then
-                # processing counter option
-                process_options ${CURRENT_LINE}
-            # lines are not equal
-            else
-                LINES_COUNTER=1
-                process_options ${CURRENT_LINE}
-            fi
+        if [ $? -eq 1 ]; then
+            print_line ${PREV_LINE}
             LINES_COUNTER=1
-            process_options ${FUTURE_LINE}
-
-            break
-        fi
-    
-        # checking lines equal
-        if [ "X${CURRENT_LINE}" = "X${FUTURE_LINE}" ]; then
-            # processing counter option
-            if [ ${N_OPTION} -eq 1 ] || [ ${C_OPTION} -eq 1 ]; then
-                # one more equal line
-                LINES_COUNTER=$(( LINES_COUNTER + 1 ))
-            fi
-        else
-            # print for counter option
-            process_options ${CURRENT_LINE}
-            LINES_COUNTER=1
-            # reset counter
+        else    
+            LINES_COUNTER=$(( LINES_COUNTER + 1 ))
         fi
 
-        PREV_LINE=${CURRENT_LINE}
-        CURRENT_LINE=${FUTURE_LINE}
+        PREV_LINE=$CURRENT_LINE
     done
+
+    check_equal_lines ${PREV_LINE} ${CURRENT_LINE}
+    if [ $? -eq 1 ]; then
+        print_line ${PREV_LINE}
+        LINES_COUNTER=1
+        print_line ${CURRENT_LINE}
+    else    
+        LINES_COUNTER=$(( LINES_COUNTER + 1 ))
+        print_line ${CURRENT_LINE}
+    fi
+
 } < ${file}

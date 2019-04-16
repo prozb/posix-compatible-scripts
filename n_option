@@ -1,41 +1,90 @@
 #! /bin/sh
 
-# emulating uniq command 
-# uniq file 
+# #################################
+#     author: Pavlo Rozbytskyi    #
+#     date  : 16.04.2019          #
+# #################################
 
- # reading file and processing line by line
 C_OPTION=0
 N_OPTION=1
 NUM_VALUE=
 LINES_COUNTER=1
+
 file="file"
+
+# processing options and printing $1 - current line for each option
+process_options () {
+    if [ ${N_OPTION} -eq 1 ] && [ ${C_OPTION} -eq 1 ]; then
+        LINES_COUNTER=$(( LINES_COUNTER + 1 ))
+
+        if [ ${LINES_COUNTER} -eq ${NUM_VALUE} ]; then
+            printf "%d %s\n" ${LINES_COUNTER} $1
+        fi
+    elif [ ${N_OPTION} -eq 1 ]; then 
+        printf "%d %s\n" ${LINES_COUNTER} $1
+    elif [ ${C_OPTION} -eq 1 ]; then
+        if [ ${LINES_COUNTER} -eq ${NUM_VALUE} ]; then
+            printf "%s\n" $1
+        fi
+    else
+        printf "%s\n" $1
+    fi
+}
+
+check_file_empty () {
+    if [ ! -s $1 ]; then
+        printf "Error: file \"$1\" is empty!" >&2  
+        exit 1
+    fi  
+}
+
 
 if [ ! -s ${file} ]; then
     printf "Error: file \"${file}\" is empty!" >&2  
     exit 1
 fi
 
+# startig script
 {
-    IFS= read -r PREV_LINE
-    # printf "%s\n" ${PREV_LINE}
+    PREV_LINE=
+    CURRENT_LINE=
+    FUTURE_LINE=
 
-    while IFS= read -r CURRENT_LINE; do
+    IFS= read -r CURRENT_LINE
+    while true; do
+
+        IFS= read -r FUTURE_LINE
+        # checking  EOF
+        if [ ! $? -eq 0 ]; then
+            if [ "X${PREV_LINE}" = "X${CURRENT_LINE}" ]; then
+                # processing counter option
+                process_options ${CURRENT_LINE}
+            # lines are not equal
+            else
+                LINES_COUNTER=1
+                process_options ${CURRENT_LINE}
+            fi
+            LINES_COUNTER=1
+            process_options ${FUTURE_LINE}
+
+            break
+        fi
+    
         # checking lines equal
-        if [ "X${PREV_LINE}" = "X${CURRENT_LINE}" ]; then
+        if [ "X${CURRENT_LINE}" = "X${FUTURE_LINE}" ]; then
             # processing counter option
-            if [ ${N_OPTION} -eq 1 ]; then
+            if [ ${N_OPTION} -eq 1 ] || [ ${C_OPTION} -eq 1 ]; then
                 # one more equal line
                 LINES_COUNTER=$(( LINES_COUNTER + 1 ))
             fi
         else
             # print for counter option
-            if [ ${N_OPTION} -eq 1 ]; then
-                printf "%d %s\n" ${LINES_COUNTER} ${PREV_LINE}
-                LINES_COUNTER=1
-            fi
+            process_options ${CURRENT_LINE}
+            LINES_COUNTER=1
             # reset counter
         fi
 
         PREV_LINE=${CURRENT_LINE}
+        CURRENT_LINE=${FUTURE_LINE}
     done
 } < ${file}

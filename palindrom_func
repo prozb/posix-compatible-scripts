@@ -1,8 +1,46 @@
 #! /bin/sh
 
-# checking two symbols equals 
+# checking letter lowercase and return uppercase
+switch_to_uppercase () {
+    char="$1"
+
+    case $char in
+        a) char=A;;  h) char=H;;  o) char=O;;  u) char=U;;  
+        b) char=B;;  i) char=I;;  p) char=P;;  v) char=V;;  
+        c) char=C;;  j) char=J;;  q) char=Q;;  w) char=W;;  
+        d) char=D;;  k) char=K;;  r) char=R;;  x) char=X;;  
+        e) char=E;;  l) char=L;;  s) char=S;;  y) char=Y;;  
+        f) char=F;;  m) char=M;;  t) char=T;;  z) char=Z;;  
+        g) char=G;;  n) char=N;;  
+    esac
+
+    printf "${char}"
+}
+# checking two symbols are equal case insensitive 
+# 
+# returns 0 if equals and 255 if not
 check_sym_equals () {
-    
+    SYM_1="$1"
+    SYM_2="$2"
+
+    # switching to uppercase first sym
+    case "$SYM_1" in 
+        [[:alpha:]]) 
+            SYM_1=$(switch_to_uppercase "$SYM_1")
+        ;;
+    esac
+    # switching to uppercase second sym
+    case "$SYM_2" in 
+        [[:alpha:]]) 
+            SYM_2=$(switch_to_uppercase "$SYM_2")
+        ;;
+    esac
+
+    if [ "X${SYM_1}" = "X${SYM_2}" ]; then 
+        return 0
+    fi
+
+    return 255
 }
 # check argument $1 is not special symbol
 check_spec_symbol () {
@@ -78,13 +116,13 @@ palindrom () {
     return 0
 }
 
-WORD_CHECK="$1"
-palindrom "$WORD_CHECK"
+# WORD_CHECK="$1"
+# palindrom "$WORD_CHECK"
 
-if [ "$?" -eq 0 ]; then
-    exit 255
-else
-    exit 0
-fi
+# if [ "$?" -eq 0 ]; then
+#     exit 255
+# else
+#     exit 0
+# fi
 
 

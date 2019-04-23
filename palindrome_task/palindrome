@@ -1,5 +1,11 @@
 #! /bin/sh
 
+# ###############################################
+# @brief: checking stdin word is palindrome     #
+#         using just POSIX standard tools       #
+#          @author: Pavlo Rozbytskyi            #
+#          @date: 23/04/2019                    #    
+# ###############################################
 
 # checking letter lowercase and return uppercase
 switch_to_uppercase () {
@@ -21,23 +27,23 @@ switch_to_uppercase () {
 # 
 # returns 0 if equals and 255 if not
 check_sym_equals () {
-    SYM_1="$1"
-    SYM_2="$2"
+    sym_1="$1"
+    sym_2="$2"
 
     # switching to uppercase first sym
-    case "$SYM_1" in 
+    case "$sym_1" in 
         [[:alpha:]]) 
-            SYM_1=$(switch_to_uppercase "$SYM_1")
+            sym_1=$(switch_to_uppercase "$sym_1")
         ;;
     esac
     # switching to uppercase second sym
-    case "$SYM_2" in 
+    case "$sym_2" in 
         [[:alpha:]]) 
-            SYM_2=$(switch_to_uppercase "$SYM_2")
+            sym_2=$(switch_to_uppercase "$sym_2")
         ;;
     esac
 
-    if [ "X${SYM_1}" = "X${SYM_2}" ]; then 
+    if [ "X${sym_1}" = "X${sym_2}" ]; then 
         return 0
     fi
 
@@ -45,9 +51,9 @@ check_sym_equals () {
 }
 # check argument $1 is not special symbol
 check_not_spec_symbol () {
-    SYM="$1"
+    sym="$1"
 
-    case "$SYM" in 
+    case "$sym" in 
     [[:alnum:]]) 
         return 0
         ;;
@@ -59,78 +65,66 @@ check_not_spec_symbol () {
 
 # checking argument $1 is palindrom
 palindrome () {
-    WORD="$1"
-    LEN=${#WORD}
+    word="$1"
+    len=${#word}
 
-    while [ "$LEN" -gt 1 ]; do
+    while [ "$len" -gt 1 ]; do
         # skipping special symbols on start
-        START_SYM=
-        while true; do  #  1 * * & a s d 
+        start_sym=
+        while true; do 
             # check there are enough symbols in word
-            if [ "${LEN}" -lt 2 ]; then
+            if [ "${len}" -lt 2 ]; then
                 return 0
             fi
 
-            START_SYM=${WORD:0:1}
-            WORD=${WORD:1:LEN}
-            LEN=${#WORD}
+            start_sym=${word:0:1}
+            word=${word:1:len}
+            len=${#word}
 
-            check_not_spec_symbol "$START_SYM"
+            check_not_spec_symbol "$start_sym"
             # stop loop if symbol is not special
             if [ "$?" -eq 0 ]; then
                 break
             fi
         done
         # skipping special symbols on the end
-        END_SYM=
-        LEN=${#WORD}
+        end_sym=
+        len=${#word}
         while true; do
             # check there are enough symbols
-            if [ ${LEN} -lt 1 ]; then 
+            if [ ${len} -lt 1 ]; then 
                 return 0
             fi
 
-            LEN=$(( LEN - 1 ))
-            END_SYM=${WORD:LEN:1}
-            WORD=${WORD:0:LEN}
-            check_not_spec_symbol "$END_SYM"
+            len=$(( len - 1 ))
+            end_sym=${word:len:1}
+            word=${word:0:len}
+            check_not_spec_symbol "$end_sym"
              # stop loop if symbol is not special
             if [ "$?" -eq 0 ]; then
                 break
             fi
         done
 
-        check_sym_equals "$END_SYM" "$START_SYM"
+        check_sym_equals "$end_sym" "$start_sym"
         # stop loop if first and last symbols aren't equal
         if [ "$?" -ne 0 ]; then
             return 255
         fi
         
-        LEN=${#WORD}
+        len=${#word}
     done
 
     return 0
 }
 
-DATE=$(date +"%Y-%m-%d %H:%M:%S")
-WORD=
-
-printf "starting program at %s.\n" "${DATE}"
-printf "%s\n" "-------------------------------------------"
-printf "%s\n" "input \"./exit\" to leave program."
-
-while true; do
-    printf "input your word: "
-    read WORD
-    WORD_COPY="${WORD}"
-    if [ "X${WORD}" == "X./exit" ]; then
-        exit 0
-    fi
-
-    palindrome "${WORD}"
+word=
+while read word; do
+    word_copy="${word}"
+    palindrome "${word}"
 
     if [ "$?" -eq 0 ]; then
-        printf "word \"%s\" is palindrome.\n" "${WORD_COPY}"
+        printf "%s\n" "${word_copy}"
     fi
 done
 

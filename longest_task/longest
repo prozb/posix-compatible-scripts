@@ -1,11 +1,9 @@
 #! /bin/sh
-
+# ###############################################
+#          @author: Pavlo Rozbytskyi            #
+#          @date: 23/04/2019                    #    
+# ###############################################
 file="$1"
-
-if [ ! -f "${file}" ]; then
-    printf "%s\n" "Error: file not found!" >&2
-    exit 1
-fi
 
 longest_line=
 current_line=
@@ -14,43 +12,38 @@ longest_length=0
 current_length=0
 
 # calculating length of the line $1
-# prints out the length of the line 
-# (ignoring spaces between lines)
+# prints out the length of the line in bible
 calculate_line_length () {
-    line="$1"
+    line=${1#* }
     len=${#line}
-    counter=0
-
-    while [ "${len}" -gt 0 ]; do
-        symb=${line:0:1}
-        line=${line:1:len}
-
-        if [ "X " != "X${symb}" ]; then
-            counter=$(( counter + 1 ))
-        fi
-
-        len=${#line}
-    done
-
-    printf "%d" "${counter}"
+    # calculate line length
+    printf "%d\n" "${#line}"
 }
 
 # processing line $1 
 process_line () {
-    echo "$1"
+    current_line="$1"
+    current_length=$(calculate_line_length "$1")
+
+    if [ ${current_length} -gt ${longest_length} ]; then
+        longest_length=${current_length}
+        longest_line=${current_line}
+    fi
 }
 
-# {
-#     IFS= read current_line
-#     process_line "${current_line}"
+if [ ! -f "${file}" ]; then
+    printf "%s\n" "Error: file not found!" >&2
+    exit 1
+fi
+{
+    IFS= read current_line
+    process_line "${current_line}"
 
-#     while IFS= read current_line; do
-#         process_line "${current_line}"
+    while IFS= read current_line; do
+        process_line "${current_line}"
+    done
 
-
-#     done
-# } < "${file}"
-
-# testing calculate_line_length function
+    printf "%s\n" "${longest_line}"
+} < "${file}"
 
 exit 0

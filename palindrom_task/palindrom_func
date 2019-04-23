@@ -1,0 +1,120 @@
+#! /bin/sh
+
+
+# checking letter lowercase and return uppercase
+switch_to_uppercase () {
+    char="$1"
+
+    case $char in
+        a) char=A;;  h) char=H;;  o) char=O;;  u) char=U;;  
+        b) char=B;;  i) char=I;;  p) char=P;;  v) char=V;;  
+        c) char=C;;  j) char=J;;  q) char=Q;;  w) char=W;;  
+        d) char=D;;  k) char=K;;  r) char=R;;  x) char=X;;  
+        e) char=E;;  l) char=L;;  s) char=S;;  y) char=Y;;  
+        f) char=F;;  m) char=M;;  t) char=T;;  z) char=Z;;  
+        g) char=G;;  n) char=N;;  
+    esac
+
+    printf "${char}"
+}
+# checking two symbols are equal case insensitive 
+# 
+# returns 0 if equals and 255 if not
+check_sym_equals () {
+    SYM_1="$1"
+    SYM_2="$2"
+
+    # switching to uppercase first sym
+    case "$SYM_1" in 
+        [[:alpha:]]) 
+            SYM_1=$(switch_to_uppercase "$SYM_1")
+        ;;
+    esac
+    # switching to uppercase second sym
+    case "$SYM_2" in 
+        [[:alpha:]]) 
+            SYM_2=$(switch_to_uppercase "$SYM_2")
+        ;;
+    esac
+
+    if [ "X${SYM_1}" = "X${SYM_2}" ]; then 
+        return 0
+    fi
+
+    return 255
+}
+# check argument $1 is not special symbol
+check_not_spec_symbol () {
+    SYM="$1"
+
+    case "$SYM" in 
+    [[:alnum:]]) 
+        return 0
+        ;;
+    *)
+        return 255
+        ;;
+    esac
+}
+
+# checking argument $1 is palindrom
+palindrom () {
+    WORD="$1"
+    LEN=${#WORD}
+
+    while [ "$LEN" -gt 1 ]; do
+        # skipping special symbols on start
+        START_SYM=
+        while true; do  #  1 * * & a s d 
+            # check there are enough symbols in word
+            if [ "${LEN}" -lt 2 ]; then
+                return 0
+            fi
+
+            START_SYM=${WORD:0:1}
+            WORD=${WORD:1:LEN}
+            LEN=${#WORD}
+
+            check_not_spec_symbol "$START_SYM"
+            # stop loop if symbol is not special
+            if [ "$?" -eq 0 ]; then
+                break
+            fi
+        done
+        # skipping special symbols on the end
+        END_SYM=
+        LEN=${#WORD}
+        while true; do
+            # check there are enough symbols
+            if [ ${LEN} -lt 1 ]; then 
+                return 0
+            fi
+
+            LEN=$(( LEN - 1 ))
+            END_SYM=${WORD:LEN:1}
+            WORD=${WORD:0:LEN}
+            check_not_spec_symbol "$END_SYM"
+             # stop loop if symbol is not special
+            if [ "$?" -eq 0 ]; then
+                break
+            fi
+        done
+
+        check_sym_equals "$END_SYM" "$START_SYM"
+        # stop loop if first and last symbols aren't equal
+        if [ "$?" -ne 0 ]; then
+            return 255
+        fi
+        
+        LEN=${#WORD}
+    done
+
+    return 0
+}
+
+WORD_CHECK="$1"
+palindrom "$WORD_CHECK"
+
+exit "$?"
+
+

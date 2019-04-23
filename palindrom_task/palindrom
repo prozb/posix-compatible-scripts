@@ -1,5 +1,6 @@
 #! /bin/sh
 
+
 # checking letter lowercase and return uppercase
 switch_to_uppercase () {
     char="$1"
@@ -72,7 +73,6 @@ palindrom () {
 
             START_SYM=${WORD:0:1}
             WORD=${WORD:1:LEN}
-            # echo "word: \"$WORD\""
             LEN=${#WORD}
 
             check_not_spec_symbol "$START_SYM"
@@ -80,21 +80,16 @@ palindrom () {
             if [ "$?" -eq 0 ]; then
                 break
             fi
-            # echo "shifting special start symbol: \"$START_SYM\""
         done
-        # echo "=====>  start  symbol \"$START_SYM\""
         # skipping special symbols on the end
         END_SYM=
-        # echo "before end word: \"$WORD\""
         LEN=${#WORD}
         while true; do
             # check there are enough symbols
             if [ ${LEN} -lt 1 ]; then 
-                # echo "len 0"
                 return 0
             fi
 
-            # echo "word: \"$WORD\""
             LEN=$(( LEN - 1 ))
             END_SYM=${WORD:LEN:1}
             WORD=${WORD:0:LEN}
@@ -103,9 +98,7 @@ palindrom () {
             if [ "$?" -eq 0 ]; then
                 break
             fi
-            # echo "shifting special end symbol: \"$END_SYM\""
         done
-        # echo "=====>  end symbol \"$END_SYM\""
 
         check_sym_equals "$END_SYM" "$START_SYM"
         # stop loop if first and last symbols aren't equal

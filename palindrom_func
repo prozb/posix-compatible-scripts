@@ -1,0 +1,86 @@
+#! /bin/sh
+
+# check argument $1 is not special symbol
+check_spec_symbol () {
+    SYM="$1"
+
+    case "$SYM" in 
+    [[:alnum:]]) 
+        return 0
+        ;;
+    *)
+        return 255
+        ;;
+    esac
+}
+
+# checking argument $1 is palindrom
+palindrom () {
+    WORD="$1"
+
+    echo "==============="
+    echo "starting with word $WORD"
+    WORD_COPY="$1"
+
+    LEN=${#WORD}
+
+    while [ "$LEN" -gt 1 ]; do
+        echo "starting main loop"
+        # implement ignoring symbols
+        START_SYM=${WORD:0:1}
+        check_spec_symbol "$START_SYM"
+
+        # skipping special symbols on start
+        while [ $? -eq 255 ]; do
+            SIZE=$(( LEN - 1 ))
+            WORD=${WORD:1:LEN}
+            
+            START_SYM=${WORD:0:1}
+            check_spec_symbol "$START_SYM"
+            LEN=${#WORD}
+        done
+        echo $START_SYM
+
+        echo "after start: $WORD"
+
+        END_POS=$(( LEN  - 1 ))
+        END_SYM=${WORD:END_POS:1}
+        check_spec_symbol "$END_SYM"
+
+        # skipping special symbols on the end
+        while [ $? -eq 255 ]; do
+            SIZE=$(( LEN - 1 ))
+            WORD=${WORD:0:LEN}
+
+            END_POS=$(( LEN  - 1 ))
+            END_SYM=${WORD:END_POS:1}
+            check_spec_symbol "$START_SYM"
+            LEN=${#WORD}
+        done
+        echo $END_SYM
+
+        if [ "$END_SYM" != "$START_SYM" ]; then
+            return 255
+        fi
+        
+        SIZE=$(( LEN - 2 ))
+
+
+        # cut word
+        WORD=${WORD:1:SIZE}
+        LEN=${#WORD}
+    done
+
+    return 0
+}
+
+WORD_CHECK="$1"
+palindrom "$WORD_CHECK"
+
+if [ "$?" -eq 0 ]; then
+    exit 255
+else
+    exit 0
+fi
+
+

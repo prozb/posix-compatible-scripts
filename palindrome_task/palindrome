@@ -58,7 +58,7 @@ check_not_spec_symbol () {
 }
 
 # checking argument $1 is palindrom
-palindrom () {
+palindrome () {
     WORD="$1"
     LEN=${#WORD}
 
@@ -112,9 +112,26 @@ palindrom () {
     return 0
 }
 
-WORD_CHECK="$1"
-palindrom "$WORD_CHECK"
+DATE=$(date +"%Y-%m-%d %H:%M:%S")
+WORD=
 
-exit "$?"
+printf "starting program at %s.\n" "${DATE}"
+printf "%s\n" "-------------------------------------------"
+printf "%s\n" "input \"./exit\" to leave program."
+
+while true; do
+    printf "input your word: "
+    read WORD
+    WORD_COPY="${WORD}"
+    if [ "X${WORD}" == "X./exit" ]; then
+        exit 0
+    fi
+
+    palindrome "${WORD}"
+
+    if [ "$?" -eq 0 ]; then
+        printf "word \"%s\" is palindrome.\n" "${WORD_COPY}"
+    fi
+done
 
 

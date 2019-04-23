@@ -58,7 +58,7 @@ check_not_spec_symbol () {
 }
 
 # checking argument $1 is palindrom
-palindrom () {
+palindrome () {
     WORD="$1"
     LEN=${#WORD}
 
@@ -113,7 +113,7 @@ palindrom () {
 }
 
 WORD_CHECK="$1"
-palindrom "$WORD_CHECK"
+palindrome "$WORD_CHECK"
 
 exit "$?"
 

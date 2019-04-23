@@ -65,16 +65,15 @@ palindrom () {
         # skipping special symbols on start
         START_SYM=
         while true; do  #  1 * * & a s d 
-            START_SYM=${WORD:0:1}
-            # echo "start sym: \"$START_SYM\"";
-            WORD=${WORD:1:LEN}
-            # echo "word: \"$WORD\""
-            LEN=${#WORD}
-
             # check there are enough symbols in word
             if [ "${LEN}" -lt 2 ]; then
                 return 0
             fi
+
+            START_SYM=${WORD:0:1}
+            WORD=${WORD:1:LEN}
+            # echo "word: \"$WORD\""
+            LEN=${#WORD}
 
             check_not_spec_symbol "$START_SYM"
             # stop loop if symbol is not special
@@ -86,12 +85,16 @@ palindrom () {
         # echo "=====>  start  symbol \"$START_SYM\""
         # skipping special symbols on the end
         END_SYM=
+        # echo "before end word: \"$WORD\""
+        LEN=${#WORD}
         while true; do
             # check there are enough symbols
             if [ ${LEN} -lt 1 ]; then 
+                # echo "len 0"
                 return 0
             fi
 
+            # echo "word: \"$WORD\""
             LEN=$(( LEN - 1 ))
             END_SYM=${WORD:LEN:1}
             WORD=${WORD:0:LEN}

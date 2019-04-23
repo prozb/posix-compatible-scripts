@@ -1,14 +1,17 @@
-#! /bin/bin
+#! /bin/sh
 
 file=$1
 while IFS= read -r var; do 
-    palindrom_correct "${var}"
+    ./palindrom_correct "${var}"
     correct_res="$?"
 
-    palindrom_func "${var}"
+    ./palindrom_func "${var}"
     my_result="$?"
 
     if [ "$my_result" -ne "$correct_res" ]; then
         echo "incorrect result for word \"$var\""
+    else
+        echo "success: for word \"$var\""
     fi
 done < "${file}"
+exit 0

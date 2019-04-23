@@ -43,7 +43,7 @@ check_sym_equals () {
     return 255
 }
 # check argument $1 is not special symbol
-check_spec_symbol () {
+check_not_spec_symbol () {
     SYM="$1"
 
     case "$SYM" in 
@@ -59,70 +59,66 @@ check_spec_symbol () {
 # checking argument $1 is palindrom
 palindrom () {
     WORD="$1"
-
-    echo "==============="
-    echo "starting with word $WORD"
-    WORD_COPY="$1"
-
     LEN=${#WORD}
 
     while [ "$LEN" -gt 1 ]; do
-        echo "starting main loop"
-        # implement ignoring symbols
-        START_SYM=${WORD:0:1}
-        check_spec_symbol "$START_SYM"
-
         # skipping special symbols on start
-        while [ $? -eq 255 ]; do
-            SIZE=$(( LEN - 1 ))
-            WORD=${WORD:1:LEN}
-            
+        START_SYM=
+        while true; do  #  1 * * & a s d 
             START_SYM=${WORD:0:1}
-            check_spec_symbol "$START_SYM"
+            # echo "start sym: \"$START_SYM\"";
+            WORD=${WORD:1:LEN}
+            # echo "word: \"$WORD\""
             LEN=${#WORD}
+
+            # check there are enough symbols in word
+            if [ "${LEN}" -lt 2 ]; then
+                return 0
+            fi
+
+            check_not_spec_symbol "$START_SYM"
+            # stop loop if symbol is not special
+            if [ "$?" -eq 0 ]; then
+                break
+            fi
+            # echo "shifting special start symbol: \"$START_SYM\""
         done
-        echo $START_SYM
-
-        echo "after start: $WORD"
-
-        END_POS=$(( LEN  - 1 ))
-        END_SYM=${WORD:END_POS:1}
-        check_spec_symbol "$END_SYM"
-
+        # echo "=====>  start  symbol \"$START_SYM\""
         # skipping special symbols on the end
-        while [ $? -eq 255 ]; do
-            SIZE=$(( LEN - 1 ))
+        END_SYM=
+        while true; do
+            # check there are enough symbols
+            if [ ${LEN} -lt 1 ]; then 
+                return 0
+            fi
+
+            LEN=$(( LEN - 1 ))
+            END_SYM=${WORD:LEN:1}
             WORD=${WORD:0:LEN}
-
-            END_POS=$(( LEN  - 1 ))
-            END_SYM=${WORD:END_POS:1}
-            check_spec_symbol "$START_SYM"
-            LEN=${#WORD}
+            check_not_spec_symbol "$END_SYM"
+             # stop loop if symbol is not special
+            if [ "$?" -eq 0 ]; then
+                break
+            fi
+            # echo "shifting special end symbol: \"$END_SYM\""
         done
-        echo $END_SYM
+        # echo "=====>  end symbol \"$END_SYM\""
 
-        if [ "$END_SYM" != "$START_SYM" ]; then
+        check_sym_equals "$END_SYM" "$START_SYM"
+        # stop loop if first and last symbols aren't equal
+        if [ "$?" -ne 0 ]; then
             return 255
         fi
         
-        SIZE=$(( LEN - 2 ))
-
-
-        # cut word
-        WORD=${WORD:1:SIZE}
         LEN=${#WORD}
     done
 
     return 0
 }
 
-# WORD_CHECK="$1"
-# palindrom "$WORD_CHECK"
+WORD_CHECK="$1"
+palindrom "$WORD_CHECK"
 
-# if [ "$?" -eq 0 ]; then
-#     exit 255
-# else
-#     exit 0
-# fi
+exit "$?"
 
 

@@ -1,0 +1,56 @@
+#! /bin/sh
+
+file="$1"
+
+if [ ! -f "${file}" ]; then
+    printf "%s\n" "Error: file not found!" >&2
+    exit 1
+fi
+
+longest_line=
+current_line=
+
+longest_length=0
+current_length=0
+
+# calculating length of the line $1
+# prints out the length of the line 
+# (ignoring spaces between lines)
+calculate_line_length () {
+    line="$1"
+    len=${#line}
+    counter=0
+
+    while [ "${len}" -gt 0 ]; do
+        symb=${line:0:1}
+        line=${line:1:len}
+
+        if [ "X " != "X${symb}" ]; then
+            counter=$(( counter + 1 ))
+        fi
+
+        len=${#line}
+    done
+
+    printf "%d" "${counter}"
+}
+
+# processing line $1 
+process_line () {
+    echo "$1"
+}
+
+# {
+#     IFS= read current_line
+#     process_line "${current_line}"
+
+#     while IFS= read current_line; do
+#         process_line "${current_line}"
+
+
+#     done
+# } < "${file}"
+
+# testing calculate_line_length function
+
+exit 0

@@ -1,5 +1,9 @@
 #! /bin/sh
 
+# checking two symbols equals 
+check_sym_equals () {
+    
+}
 # check argument $1 is not special symbol
 check_spec_symbol () {
     SYM="$1"

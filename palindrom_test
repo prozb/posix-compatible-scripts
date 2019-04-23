@@ -1,0 +1,15 @@
+#! /bin/sh
+
+word="$1"
+
+echo $word | rev > "file.tmp"
+
+read -r WORD_R < "file.tmp"
+rm -rf "file.tmp"
+
+if [ "X${WORD_R}" = "X${word}" ]; then 
+    exit 0
+fi
+
+exit 255
+

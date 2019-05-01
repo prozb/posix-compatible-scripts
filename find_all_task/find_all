@@ -1,0 +1,75 @@
+#! /bin/sh
+getopts_temp=":b:c:d:e:f:h:k:p:r:s:u:w:L:O:G:S:Rl:P:"
+test_option=
+test_dir=
+r_option=1
+l_option=1
+l_file=
+p_option=1
+p_pattern=
+
+while getopts "${getopts_temp}" option;
+do 
+    case "${option}" in
+        b|c|d|e|f|h|k|p|r|s|u|w|L|O|G|S ) 
+        # check option set 
+            test_option="${option}"
+            ;;
+        l )
+            l_option=0
+            l_file="${OPTARG}"
+            ;;
+        R ) 
+            r_option=0
+            ;;
+        P )
+            p_option=0
+            p_pattern="${OPTARG}"
+            ;;
+        \? )
+            printf "Incorrect option -${option}\n" >&2
+            exit 1
+            ;;
+    esac
+done
+shift $(( OPTIND - 1 ))
+
+# checking log option
+if [ "${l_option}" -eq 0 ]; then 
+    if [ "X${l_file}" = "X" ]; then
+        l_file="logfile"
+    fi
+
+    date_format=$(eval "date '+%Y-%m-%d %H:%M:%S'")
+    console_info=$(eval "who i am")
+    
+    printf "Date: %s\nCurrent working directory: %s\nInfo: %s\n%s\n" \
+    "${date_format}" "$PWD" "${console_info}" "==================================" > ${l_file}
+    exec 2>> ${l_file}
+fi
+
+test_dir="$1"
+# checking directory set
+if [ "X${test_dir}" = "X" ]; then
+    test_dir="."
+fi
+# checking test option set
+if [ "X${test_option}" = "X" ]; then
+    test_option="f"
+fi
+# checking dir exists
+if ls ${test_dir} && test -d ${test_dir} >&2; then
+    path_name=${test_dir}
+fi
+
+cd ${path_name}
+
+ls -A . | while read file; do
+    if test "-${test_option}" ${file}; then
+        echo "$file"
+    fi
+done
+
+cd ..
+# ls -A s
+

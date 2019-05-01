@@ -13,12 +13,11 @@ p_pattern=
 # $2 - test option
 find_directory () {
     cd "$1"
-    dir_name=$(eval basename $PWD)
 
-    printf ">dir: %s\n" "${dir_name}"
     ls -A . | while read file; do
-        if test "-$2" ${file}; then
-            path=$(realpath ${file})
+        # echo "${file}"
+        if test "-$2" "${file}"; then
+            path=$(realpath "${file}")
             printf "%s\n" "${path}"
         fi
         

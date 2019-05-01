@@ -8,6 +8,13 @@ l_file=
 p_option=1
 p_pattern=
 
+# printing debug message
+# $1 debug message
+print_debug () {
+    if [ "${l_option}" -eq 0 ]; then
+        printf "%s\n" "$1" >&2
+    fi
+}
 # function inspects directory
 # $1 - path to directory
 # $2 - test option
@@ -18,7 +25,18 @@ find_directory () {
         # echo "${file}"
         if test "-$2" "${file}"; then
             path=$(realpath "${file}")
-            printf "%s\n" "${path}"
+            dir_path=$(PWD)
+            
+            # print matching files
+            if [ "${p_option}" -eq 0 ]; then 
+                case ${file} in
+                ${p_pattern} ) 
+                    printf "%s\n" "${path}"
+                 ;;
+                esac
+            else
+                printf "%s\n" "${path}"
+            fi
         fi
         
         # use recursion if r option set and file is directory
@@ -27,21 +45,21 @@ find_directory () {
             step_flag=0
             if [ -L "${file}" ]; then
                 step_flag=1
-                printf "DEBUG| \"%s\" is symlink\n" "${file}" >&2
+
+                print_debug "DEBUG| \"${file}\" is symlink"
             fi
 
             if [ ! -r "${file}" ]; then 
                 step_flag=1
-                printf "DEBUG| \"%s\" is not readable\n" "${file}" >&2
+                print_debug "DEBUG| \"$file\" is not readable"
             fi
 
             if [ ! -e "${file}" ]; then
                 step_flag=1
-                printf "DEBUG| \"%s\" is not executable\n" "${file}" >&2
+                print_debug "DEBUG| \"$file\" is not executable"
             fi
 
             if [ "${step_flag}" -eq 0 ]; then
-                # printf "DEBUG| step into \"%s\"\n" "${file}" >&2
                 find_directory "${file}" "$2"
             fi
         fi
@@ -69,7 +87,7 @@ do
             p_pattern="${OPTARG}"
             ;;
         \? )
-            printf "DEBUG| Incorrect option -${option}\n" >&2
+            printf "Incorrect option -${option}\n" >&2
             exit 1
             ;;
     esac
@@ -89,42 +107,40 @@ fi
 test_dir="$1"
 date_format=$(eval "date '+%Y-%m-%d %H:%M:%S'")
 
-printf "DEBUG| %s\nDEBUG| %s\n" "${date_format}" "$PWD" >&2
-printf "%s\n" "------------------------------------------------------" >&2
-printf "DEBUG| starting programming with command line parameters\n" >&2
-printf "DEBUG| dir=%s\n" "${test_dir}" >&2
+print_debug "DEBUG| ${date_format}"
+print_debug "DEBUG| $PWD"
+print_debug "DEBUG| starting programm with command line parameters: "
+print_debug "DEBUG| dir=${test_dir}"
 # checking directory set
 if [ "X${test_dir}" = "X" ]; then
     test_dir="."
-    printf "DEBUG| setting current directory to: %s\n" "${test_dir}" >&2
+    print_debug "DEBUG| setting current directory to: ${test_dir}"
 fi
 # checking test option set
-printf "DEBUG| option=%s\n" "${test_option}" >&2
+print_debug "DEBUG| option=${test_option}\n"
 if [ "X${test_option}" = "X" ]; then
     test_option="f"
-    printf "DEBUG| setting option=%s\n" "${test_option}" >&2
+    print_debug "DEBUG| setting option=${test_option}"
 fi
 
 # checking r option
 if [ "${r_option}" -eq 0 ]; then
-    printf "DEBUG| option=%s\n" "r" >&2
+    print_debug "DEBUG| option=r"
 fi
 
 # checking p option
 if [ "${p_option}" -eq 0 ]; then
-    printf "DEBUG| option=%s\n" "p" >&2
-    printf "DEBUG| pattern=%s\n" "${p_pattern}" >&2
+    print_debug "DEBUG| option=p"
+    print_debug "DEBUG| pattern=${p_pattern}"
 fi
 
 if [ "${l_option}" -eq 0 ]; then
-    printf "DEBUG| option=%s\n" "l" >&2
-    printf "DEBUG| file=%s\n" "${l_file}" >&2
+        printf "DEBUG| option=%s\n" "l" >&2
+        printf "DEBUG| file=%s\n" "${l_file}" >&2
 fi
-printf "%s\n" "------------------------------------------------------" >&2
-
 # checking dir exists
 if [ ! -d ${test_dir} ]; then
-    printf "DEBUG| directory \"%s\" does not exist\nDEBUG| terminating\n" "${test_dir}" >&2
+    printf "directory \"%s\" does not exist\terminating\n" "${test_dir}" >&2
     printf "%s\n" "------------------------------------------------------" >&2
     exit 1
 fi

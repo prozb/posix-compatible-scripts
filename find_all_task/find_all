@@ -8,6 +8,49 @@ l_file=
 p_option=1
 p_pattern=
 
+# function inspects directory
+# $1 - path to directory
+# $2 - test option
+find_directory () {
+    cd "$1"
+    dir_name=$(eval basename $PWD)
+
+    printf ">dir: %s\n" "${dir_name}"
+    ls -A . | while read file; do
+        if test "-$2" ${file}; then
+            path=$(realpath ${file})
+            printf "%s\n" "${path}"
+        fi
+        
+        # use recursion if r option set and file is directory
+        if [ "${r_option}" -eq 0 ] && [ -d "${file}" ]; then
+            # step into directory if not symlink, if readable and executable
+            step_flag=0
+            if [ -L "${file}" ]; then
+                step_flag=1
+                printf "DEBUG| \"%s\" is symlink\n" "${file}" >&2
+            fi
+
+            if [ ! -r "${file}" ]; then 
+                step_flag=1
+                printf "DEBUG| \"%s\" is not readable\n" "${file}" >&2
+            fi
+
+            if [ ! -e "${file}" ]; then
+                step_flag=1
+                printf "DEBUG| \"%s\" is not executable\n" "${file}" >&2
+            fi
+
+            if [ "${step_flag}" -eq 0 ]; then
+                # printf "DEBUG| step into \"%s\"\n" "${file}" >&2
+                find_directory "${file}" "$2"
+            fi
+        fi
+    done
+
+    cd ..
+}
+
 while getopts "${getopts_temp}" option;
 do 
     case "${option}" in
@@ -42,12 +85,12 @@ if [ "${l_option}" -eq 0 ]; then
 
     printf "" > ${l_file}
     exec 2>> ${l_file}
-
-    date_format=$(eval "date '+%Y-%m-%d %H:%M:%S'")
-    printf "DEBUG| %s\nDEBUG| %s\n" "${date_format}" "$PWD" >&2
 fi
 
 test_dir="$1"
+date_format=$(eval "date '+%Y-%m-%d %H:%M:%S'")
+
+printf "DEBUG| %s\nDEBUG| %s\n" "${date_format}" "$PWD" >&2
 printf "%s\n" "------------------------------------------------------" >&2
 printf "DEBUG| starting programming with command line parameters\n" >&2
 printf "DEBUG| dir=%s\n" "${test_dir}" >&2
@@ -81,18 +124,11 @@ fi
 printf "%s\n" "------------------------------------------------------" >&2
 
 # checking dir exists
-if ls ${test_dir} && test -d ${test_dir} >&2; then
-    path_name=${test_dir}
+if [ ! -d ${test_dir} ]; then
+    printf "DEBUG| directory \"%s\" does not exist\nDEBUG| terminating\n" "${test_dir}" >&2
+    printf "%s\n" "------------------------------------------------------" >&2
+    exit 1
 fi
-
-cd ${path_name}
-
-# ls -A . | while read file; do
-#     if test "-${test_option}" ${file}; then
-#         echo "$file" >&2
-#     fi
-# done
-
-cd ..
-# ls -A s
+# stepping into directory
+find_directory "${test_dir}" "${test_option}"
 

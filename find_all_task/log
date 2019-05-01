@@ -1,9 +1,15 @@
-DEBUG| 2019-05-01 14:18:47
+DEBUG| 2019-05-01 17:36:07
 DEBUG| /Users/p.rozbytskyi/Desktop/Semester5/UE/shell_scripts/find_all_task
 ------------------------------------------------------
 DEBUG| starting programming with command line parameters
-DEBUG| dir=file
+DEBUG| dir=.
 DEBUG| option=f
+DEBUG| option=r
 DEBUG| option=l
 DEBUG| file=log
 ------------------------------------------------------
+DEBUG| step into "path1"
+./find_all: line 20: test: -0: unary operator expected
+DEBUG| step into "die"
+./find_all: line 20: test: -0: unary operator expected
+./find_all: line 20: test: -0: unary operator expected

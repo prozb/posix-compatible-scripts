@@ -1,5 +1,5 @@
 #! /bin/sh
-getopts_temp=":b:c:d:e:f:h:k:p:r:s:u:w:L:O:G:S:Rl:P:"
+getopts_temp=":bcdefhkprsuwLOGSRl:P:"
 test_option=
 test_dir=
 r_option=1
@@ -27,7 +27,7 @@ do
             p_pattern="${OPTARG}"
             ;;
         \? )
-            printf "Incorrect option -${option}\n" >&2
+            printf "DEBUG| Incorrect option -${option}\n" >&2
             exit 1
             ;;
     esac
@@ -40,23 +40,46 @@ if [ "${l_option}" -eq 0 ]; then
         l_file="logfile"
     fi
 
-    date_format=$(eval "date '+%Y-%m-%d %H:%M:%S'")
-    console_info=$(eval "who i am")
-    
-    printf "Date: %s\nCurrent working directory: %s\nInfo: %s\n%s\n" \
-    "${date_format}" "$PWD" "${console_info}" "==================================" > ${l_file}
+    printf "" > ${l_file}
     exec 2>> ${l_file}
+
+    date_format=$(eval "date '+%Y-%m-%d %H:%M:%S'")
+    printf "DEBUG| %s\nDEBUG| %s\n" "${date_format}" "$PWD" >&2
 fi
 
 test_dir="$1"
+printf "%s\n" "------------------------------------------------------" >&2
+printf "DEBUG| starting programming with command line parameters\n" >&2
+printf "DEBUG| dir=%s\n" "${test_dir}" >&2
 # checking directory set
 if [ "X${test_dir}" = "X" ]; then
     test_dir="."
+    printf "DEBUG| setting current directory to: %s\n" "${test_dir}" >&2
 fi
 # checking test option set
+printf "DEBUG| option=%s\n" "${test_option}" >&2
 if [ "X${test_option}" = "X" ]; then
     test_option="f"
+    printf "DEBUG| setting option=%s\n" "${test_option}" >&2
 fi
+
+# checking r option
+if [ "${r_option}" -eq 0 ]; then
+    printf "DEBUG| option=%s\n" "r" >&2
+fi
+
+# checking p option
+if [ "${p_option}" -eq 0 ]; then
+    printf "DEBUG| option=%s\n" "p" >&2
+    printf "DEBUG| pattern=%s\n" "${p_pattern}" >&2
+fi
+
+if [ "${l_option}" -eq 0 ]; then
+    printf "DEBUG| option=%s\n" "l" >&2
+    printf "DEBUG| file=%s\n" "${l_file}" >&2
+fi
+printf "%s\n" "------------------------------------------------------" >&2
+
 # checking dir exists
 if ls ${test_dir} && test -d ${test_dir} >&2; then
     path_name=${test_dir}
@@ -64,11 +87,11 @@ fi
 
 cd ${path_name}
 
-ls -A . | while read file; do
-    if test "-${test_option}" ${file}; then
-        echo "$file"
-    fi
-done
+# ls -A . | while read file; do
+#     if test "-${test_option}" ${file}; then
+#         echo "$file" >&2
+#     fi
+# done
 
 cd ..
 # ls -A s

@@ -21,10 +21,39 @@ process_directory () {
 
                 # device special files always have size zero
                 if(type!="c" || type!="b"){
+                    # calculating information about file types
                     hash_map_size[type]+=$5
+
+                    # calculating information about file extentions
+                    file_name=$9
+                    file_first=substr(file_name, 0, 1);
+
+                    if(file_first=="."){
+                        file_ext=""
+                    }else{
+                        file_ext=split(file_name, a, ".");
+                        file_ext=a[2]
+                    }
+                    hash_ext_size[file_ext]+=$5
+                    hash_ext_count[file_ext]+=1
                 }else{
+                    # calculating information about file types
                     hash_map_size[type]=0
+
+                    # calculating information about file extentions   
+                    file_name=$10
+                    file_first=substr(file_name, 0, 1);
+
+                    if(file_first=="."){
+                        file_ext=""
+                    }else{
+                        file_ext=split(file_name, a, ".");
+                        file_ext=a[2]
+                    }
+                    hash_ext_size[file_ext]=0
+                    hash_ext_count[file_ext]+=1
                 }
+
                 hash_map_count[type]+=1
             }
         }
@@ -41,6 +70,25 @@ process_directory () {
                 sz_sum+=hash_map_size[key]
             }
             print "sum", no_sum, sz_sum
+            print "---------------------"
+
+            print "\n====================="
+            print "ext\tno\tsz"
+
+            ext_no_sum=0
+            ext_sz_sum=0
+
+            for(key in hash_ext_count){
+                print key, hash_ext_count[key], hash_ext_size[key]
+            }   
+
+            for(key in hash_ext_size){
+                ext_no_sum+=hash_ext_count[key]
+                ext_sz_sum+=hash_ext_size[key]
+            } 
+            print "---------------------"
+            print "sum", ext_no_sum, ext_sz_sum
+            print "---------------------"
         }
         '
 }

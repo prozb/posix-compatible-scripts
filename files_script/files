@@ -7,23 +7,40 @@ print_error () {
 # processing directory 
 # $1 - directory name
 process_directory () {
-    echo "processing directory $1"
-
     ls -lA "$1" | awk '
         BEGIN {
+            ORS="\n"
+            OFS="\t"
             print "tp\tno\tsz" 
         }
         { 
             # skipping first total line 
             if ($1!="total") {
-                # checking type of file
+                # getting type of the file
                 type=substr($1, 0, 1);
-                print "type is: ", type;
+
+                # device special files always have size zero
+                if(type!="c" || type!="b"){
+                    hash_map_size[type]+=$5
+                }else{
+                    hash_map_size[type]=0
+                }
+                hash_map_count[type]+=1
             }
         }
-        END{
-            print "----------------"
-            print "beste leben"
+        END{ 
+            for(key in hash_map_count){
+                print key, hash_map_count[key], hash_map_size[key]
+            }   
+            print "---------------------"
+            no_sum=0
+            sz_sum=0
+
+            for(key in hash_map_size){
+                no_sum+=hash_map_count[key]
+                sz_sum+=hash_map_size[key]
+            }
+            print "sum", no_sum, sz_sum
         }
         '
 }

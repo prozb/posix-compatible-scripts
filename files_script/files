@@ -8,6 +8,24 @@ print_error () {
 # $1 - directory name
 process_directory () {
     echo "processing directory $1"
+
+    ls -lA "$1" | awk '
+        BEGIN {
+            print "tp\tno\tsz" 
+        }
+        { 
+            # skipping first total line 
+            if ($1!="total") {
+                # checking type of file
+                type=substr($1, 0, 1);
+                print "type is: ", type;
+            }
+        }
+        END{
+            print "----------------"
+            print "beste leben"
+        }
+        '
 }
 
 if [ "$#" -eq 0 ]; then

@@ -25,7 +25,7 @@ int main(int argc, char *argv[]) {
                 printf("   ");
             }
         }
-        printf("\n\n");
+        printf("\n");
     }
 
     return 0;

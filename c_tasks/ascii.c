@@ -1,34 +1,31 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <ctype.h>
 
-int print_ascii(void);
-
 int main(int argc, char *argv[]) {
-    print_ascii();
 
-    return 0;
-}
+    for(int i = 0; i < 5; i++) { printf("Oct Dec Hex Chr   "); }
+    printf("\n");
+    for(int i = 0; i < 5; i++) { printf("---------------   "); }
+    printf("\n");
 
-int print_ascii(void){
-    char *table_header = "Oct Dec Hex Chr\n---------------";
+    for (int i = 0; i < 26; i++){
+        // printing each table
+        for(int j = 0; j < 5; j++){
+            int char_index = i + j * 26;
 
-    // clear terminal 
-    clear();
+            if(char_index < 128){
+                printf("%03o %3d %3x ", char_index, char_index, char_index);
 
-    for (int i = 0; i < 127; i++){
-        if(i == 0 || i == 32 || i == 64 || i == 116 || i == 150){
-            // printing new table header
-            printf("%s\n", table_header);
-
+                if(isprint(char_index)){
+                    printf("%3c", char_index);
+                }else{
+                    printf("   ");
+                }
+                printf("   ");
+            }
         }
-        
-        printf("%03o %-3d %-3x ", i, i, i);
-
-        if(isprint(i)){
-            printf("%-3c\n", i);
-        }else{
-            printf("\n");
-        }
+        printf("\n\n");
     }
 
     return 0;

@@ -140,3 +140,5 @@ google-services.json
 # End of https://www.gitignore.io/api/androidstudio
 
 .vscode/*
+*.o
+*.txt

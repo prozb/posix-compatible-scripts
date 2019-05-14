@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <ctype.h>
 
-#define MAXWLEN 129
+#define MAXWLEN 5
 #define DEBUG 
 
 int process_word(char []);
@@ -18,52 +18,43 @@ int main(void){
     // int current_max = 0;
 
     while ((current_len = read_next_word(current_word, MAXWLEN)) != 0){
-        printf("%d ", current_len);
-        print_word(current_word); 
+        // printf("%d ", current_len);
+        // print_word(current_word); 
     }    
-
+    
     return 0;
 }
 
 void print_word(char word[]){
-    // #ifdef DEBUG 
-    //     printf("word: ");
-    // #endif
-
     for(int i = 0; i < MAXWLEN - 1 && word[i] != '\0'; i++){
         printf("%c", word[i]);
     }
     printf("\n");
-
-    // #ifdef DEBUG 
-    // #endif
 }
 
 int read_next_word(char buf[], int buf_len){
     int len = 0;
-    char current_char = getchar();
+    char current_char;
+    
+    --buf_len;
 
-    // printf("debug here: %c\n", current_char);
-
-    while(current_char != EOF && current_char != ' ' && current_char != '\0'){
+    while((current_char = getchar()) != EOF && current_char != ' '){
         // ignoring all not printable
-
         if(isgraph(current_char)){
             // push to buffer if size < 129
-            if(len < buf_len - 1){
-                // printf("pushing: %c\n", current_char);
-
-                buf[len++] = current_char;
-            }else{
-                len++;
+            if(len < buf_len){
+                buf[len] = current_char;
             }
+            len++;
         }
-        current_char = getchar();
     }
-
-    // printf("size return: %d\n", len);
+    
     // setting null byte
-    buf[len] = '\0';
+    if(len < buf_len){
+        buf[len] = '\0';
+    }else{
+        buf[buf_len] = '\0';
+    }
 
     return len;
 }

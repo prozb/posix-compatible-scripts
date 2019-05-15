@@ -7,7 +7,7 @@
 #include <ctype.h>
 #include <string.h>
 
-#define MAXWLEN 10
+#define MAXWLEN 129
 #define DEBUG printf("correct\n");
 
 int read_next_word(char [], int);

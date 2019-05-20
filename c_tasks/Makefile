@@ -1,11 +1,13 @@
 CFLAGS = -g -Wall -std=c99 -pedantic -o
 
 ascii: 
-	gcc $(CFLAGS) ascii.o ascii.c
+	gcc $(CFLAGS) ascii ascii.c
 mx3lw:
-	gcc $(CFLAGS) mx3lw.o mx3lw.c
+	gcc $(CFLAGS) mx3lw mx3lw.c
+mycat: 
+	gcc $(CFLAGS) mycat mycat.c
 clean:
-	rm -f *.o
+	rm -f *.o mx3lw mycat ascii
 
 
 

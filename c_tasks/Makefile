@@ -6,8 +6,10 @@ mx3lw:
 	gcc $(CFLAGS) mx3lw mx3lw.c
 mycat: 
 	gcc $(CFLAGS) mycat mycat.c
+numq: 
+	gcc $(CFLAGS)  numq numq.c
 clean:
-	rm -f *.o mx3lw mycat ascii
+	rm -f *.o mx3lw mycat numq ascii
 
 
 

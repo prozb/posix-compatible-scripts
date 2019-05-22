@@ -1,34 +1,37 @@
 #include <stdio.h>
+#define MAX_SIZE 129
 
 int numq(int *, int *, int **, int **, int, int);
-int push(int);
-int pop(void);
 
 int main(void){
-    int buffer [4] = {1,2,3,4};
+    int buffer [MAX_SIZE];
 
-    int a = 11;
-    
     int *buf_start;
     int *buf_end;
 
-    buf_start = (buffer + 2);
-    buf_end   = (buffer + 3);
+    buf_start = (buffer + 0);
+    buf_end   = (buffer + 1);
     
     int **buf_start_point = &buf_start;
     int **buf_end_point   = &buf_end;
 
-    int len;
+    int var;
 
-    len = numq(buffer, &buffer[3], buf_start_point, buf_end_point, a++, 0);
-    len = numq(buffer, &buffer[3], buf_start_point, buf_end_point, a++, 0);
-    len = numq(buffer, &buffer[3], buf_start_point, buf_end_point, a++, 0);
-    
-    for(int i = 0; i < 4; i++){
-        printf("%d\n", buffer[i]);
+    while(scanf("%i", &var) != EOF){
+        numq(buffer, &buffer[MAX_SIZE - 1], buf_start_point, buf_end_point, var, 0);
     }
 
-    printf("%d\n", len);
+    printf("\n");
+    (*buf_start_point)++;
+    for(int i = 0; i < 4; i++){
+        int len = numq(buffer, &buffer[MAX_SIZE - 1], buf_start_point, buf_end_point, 0, 1);
+        
+        if(len != -1){
+            printf("%d\n", *((*buf_start_point) - 1)); 
+        }else{
+            break;
+        }
+    }
 }
 
 // int *start_stack pointer to start array 
@@ -40,38 +43,36 @@ int main(void){
 int numq(int *start_stack, int *end_stack, int **oldest_entry, int **next_free, int inp, int subs){
     // substitute modus
     if(subs > 0)
-    {
-
-    // adding modus 
-    }
-    else
-    {
+    {   
+        // check not empty
+        if(*oldest_entry == *next_free){
+            return -1;
+        }
+        
+        // wrap around
+        if(*oldest_entry == end_stack){
+            *oldest_entry = start_stack;
+        }else{
+            (*oldest_entry)++;
+        }
+        return *next_free - *oldest_entry;
+    }else{
+        // adding modus
         // check not full
         if(*next_free == *oldest_entry - 1 ||
-           (*oldest_entry == start_stack) && (*next_free == end_stack))
-        {   
+            (*oldest_entry == start_stack) && (*next_free == end_stack)){   
             return -1;
-        }else{
-            if(*next_free == end_stack)
-            {
-                *end_stack = inp;
-                *next_free = start_stack;
-            }else{  
-                **next_free = inp; 
-                (*next_free)++;                    
-            }
-
-            return *oldest_entry - *next_free - 1;
         }
-         
-    }
-    // if(*ca == *cx || *cx == *ca - 1 ||
-    //   (*ca == ba) && (*cx == bx - 1))
-    // {
-    //     return -1;
-    // }
-    // if pushing to full queue or pop from empty
-    
 
-    return 0;
+        if(*next_free == end_stack)
+        {
+            *end_stack = inp;
+            *next_free = start_stack;
+        }else{  
+            **next_free = inp; 
+            (*next_free)++;                    
+        }
+
+        return *oldest_entry - *next_free - 1;
+    }
 }

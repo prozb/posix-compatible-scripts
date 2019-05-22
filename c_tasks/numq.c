@@ -54,15 +54,14 @@ int numq(int *start_stack, int *end_stack, int **oldest_entry, int **next_free, 
         }else{
             if(*next_free == end_stack)
             {
-                *end_stack   = inp;
-                *next_free  = start_stack;
+                *end_stack = inp;
+                *next_free = start_stack;
             }else{  
                 **next_free = inp; 
-                (*next_free)++;                
+                (*next_free)++;                    
             }
-            
-            // todo fix size
-            return *next_free - *oldest_entry;   
+
+            return *oldest_entry - *next_free - 1;
         }
          
     }

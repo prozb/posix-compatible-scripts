@@ -9,8 +9,8 @@
 
 #define MAXWLEN 5
 
-int getl(char [], int);
-void print_line(char []);
+int getl(char *, int);
+void print_line(char *);
 
 int main(void){
     int current_len = 0;

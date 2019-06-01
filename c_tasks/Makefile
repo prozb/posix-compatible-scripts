@@ -9,7 +9,7 @@ mycat:
 numq: 
 	gcc $(CFLAGS)  numq numq.c
 myexpr:
-	gcc $(CFLAGS)  myexpr myexpr.c
+	gcc $(CFLAGS) myexpr myexpr.c -lm
 clean:
 	rm -f *.o mx3lw mycat numq ascii myexpr
 

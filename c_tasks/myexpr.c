@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 #define STACK_SIZE 2
 #define ADD "+"
@@ -18,11 +19,6 @@
 
 int push(double);
 int pop(double *);
-int exec_add(void);
-int exec_sub(void);
-int exec_mul(void);
-int exec_div(void);
-int exec_pow(void);
 int get_size();
 int exec_operation(char *);
 int parse_double(char *, double *);
@@ -49,7 +45,7 @@ int main(int argc, char *argv[]){
     }
     // printing result 
     double res;
-    if(pop(&res) != 0)
+    if(pop(&res) != 0 && get_size() != 0)
         return 1;
 
     printf("%g\n", res);
@@ -71,49 +67,30 @@ int parse_double(char *op, double *num){
 }
 
 int exec_operation(char *op){
+    double op1, op2, res;
+
+    if(pop(&op1) != 0 || pop(&op2) != 0)
+        return 1;
+
     if(strcmp(op, ADD) == 0){
-        if(exec_add() != 0)
-            return 1;
+        res = op1 + op2;
     }else if(strcmp(op, SUB) == 0){
-        if(exec_sub() != 0)
-            return 1;
+        res = op2 - op1;
     }else if(strcmp(op, MUL) == 0){
-        // todo
+        res = op2 * op1;
     }else if(strcmp(op, DIV) == 0){
-        // todo
-        // implement zero division checking
+        if(op1 == 0)
+            return 1;
+        res = op2 / op1;
     }else if(strcmp(op, POW) == 0){
-        // todo
+        if(op2 < 0 && ceilf(op1) != op1)
+            return 1;
+        res = pow(op2, op1);
     }else{
-        // unpermited operation
         return 1;
     }
 
-    return 0;
-}
-
-int exec_add(void){
-    double a0, a1, sum;
-
-    if(pop(&a0) != 0 || pop(&a1) != 0)
-        return 1;
-    
-    sum = a0 + a1;
-
-    if(push(sum) != 0)
-        return 1;
-    return 0;
-}
-
-int exec_sub(void){
-    double a0, a1, sub;
-
-    if(pop(&a0) != 0 || pop(&a1) != 0)
-        return 1;
-    
-    sub = a1 - a0;
-
-    if(push(sub) != 0)
+    if(push(res) != 0)
         return 1;
     return 0;
 }

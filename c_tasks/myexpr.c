@@ -9,7 +9,7 @@
 #include <string.h>
 #include <math.h>
 
-#define STACK_SIZE 2
+#define STACK_SIZE 64
 #define ADD "+"
 #define SUB "-"
 #define DIV "/"

@@ -8,8 +8,10 @@ mycat:
 	gcc $(CFLAGS) mycat mycat.c
 numq: 
 	gcc $(CFLAGS)  numq numq.c
+myexpr:
+	gcc $(CFLAGS)  myexpr myexpr.c
 clean:
-	rm -f *.o mx3lw mycat numq ascii
+	rm -f *.o mx3lw mycat numq ascii myexpr
 
 
 

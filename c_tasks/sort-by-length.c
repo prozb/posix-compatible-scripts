@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h> 
 #include "getline.c" 
 
 typedef struct string_t{
@@ -12,13 +13,14 @@ int push_line(char *);
 // compares first and second parameter. 
 // If > 0 => first parameted greater than second
 int comparator(const void *, const void *);
+int comparator_reverse(const void *, const void *);
 
 static int r_flag;
 static int size;
 static string_t *lines;
 
 int main(int argc, char *argv[]){
-    if (argc > 1 && strcmp("r", argv[1]) == 0){
+    if (argc > 1 && strcmp("-r", argv[1]) == 0){
         r_flag = 1;
     }
 
@@ -33,13 +35,16 @@ int main(int argc, char *argv[]){
         push_line(line);
     }
 
-    printf("printing lines out:\n");
+    if(r_flag){
+        qsort(lines, (size - 1), sizeof(string_t), comparator_reverse);
+    }else{
+        qsort(lines, (size - 1), sizeof(string_t), comparator);
+    }
+
     for(int i = 0; i < (size - 1); i++){
-        printf("len: %ld, %s", (lines + i)->len, (lines + i)->str);
+        printf("%s", (lines + i)->str);
     }
     
-    printf("%d\n", comparator(&lines[0], &lines[1]));
-
     free(lines);
     
     return 0;
@@ -81,4 +86,11 @@ int comparator(const void *line_str1 , const void *line_str2){
     const string_t *str2 = (const string_t *)line_str2;
 
     return str1->len - str2->len;
+}
+
+int comparator_reverse(const void *line_str1 , const void *line_str2){
+    const string_t *str1 = (const string_t *)line_str1; 
+    const string_t *str2 = (const string_t *)line_str2;
+
+    return str2->len - str1->len;
 }

@@ -10,8 +10,10 @@ numq:
 	gcc $(CFLAGS)  numq numq.c
 myexpr:
 	gcc $(CFLAGS) myexpr myexpr.c -lm
+sort-by-length:
+	gcc $(CFLAGS) sort-by-length sort-by-length.c
 clean:
-	rm -f *.o mx3lw mycat numq ascii myexpr
+	rm -f *.o mx3lw mycat numq ascii myexpr sort-by-length
 
 
 

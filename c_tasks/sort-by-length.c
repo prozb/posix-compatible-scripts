@@ -9,6 +9,9 @@ typedef struct string_t{
 
 // pushing line on the stack
 int push_line(char *);
+// compares first and second parameter. 
+// If > 0 => first parameted greater than second
+int comparator(const void *, const void *);
 
 static int r_flag;
 static int size;
@@ -35,7 +38,7 @@ int main(int argc, char *argv[]){
         printf("len: %ld, %s", (lines + i)->len, (lines + i)->str);
     }
     
-    
+    printf("%d\n", comparator(&lines[0], &lines[1]));
 
     free(lines);
     
@@ -71,4 +74,11 @@ int push_line(char *line){
     }
 
     return 0;
+}
+
+int comparator(const void *line_str1 , const void *line_str2){
+    const string_t *str1 = (const string_t *)line_str1; 
+    const string_t *str2 = (const string_t *)line_str2;
+
+    return str1->len - str2->len;
 }

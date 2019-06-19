@@ -9,8 +9,9 @@
 #include <fcntl.h>
 #include <libgen.h>
 #include <string.h>
+#include <stdlib.h>
+#include <errno.h> 
 
-#define BUFFER_SIZE 256
 #define MAX_DIR_LENGTH 256
 
 // recursive creating directories
@@ -21,8 +22,6 @@ int main(int argc, char *argv[]){
         fprintf(stderr, "Error: parameters not given\n");
         return 1;
     }
-
-    char buffer [BUFFER_SIZE + 1];
 
     struct stat source;
     struct stat target;
@@ -39,10 +38,14 @@ int main(int argc, char *argv[]){
     stat(argv[2], &target);
 
     // creating intermediate directories
+    char *file_path = malloc(strlen(argv[2]));
+    strcpy(file_path, argv[2]);
+
     char *dir  = dirname(argv[2]);
-    char path[strlen(dir) + 1];
+    char path[strlen(dir) + 2];
     strcpy(path, dir); 
-    strcat(path, "/");
+    strcat(path, "/\0");
+
 
     if(_mkdir(path) != 0){
         return 1;
@@ -59,18 +62,27 @@ int main(int argc, char *argv[]){
         return 1;
     }
     
-    if((pfd = open(argv[2], O_CREAT | O_WRONLY, source.st_mode)) == -1){
-        fprintf(stderr, "Error: cannot open target file \"%s\"\n", argv[2]);
+    // stat()
+    printf("%s\n", file_path);
+    if((pfd = open(file_path, O_CREAT | O_WRONLY, source.st_mode)) == -1){
+        fprintf(stderr, "Error: cannot open target file \"%s\" val: %d\n", file_path, errno);
         return 1;
     }
 
-    ftruncate(pfd, source.st_size);
-    stat(argv[2], &target);
+    stat(file_path, &target);
+
+    int block_len = source.st_blksize;
+    char *buffer;
+    if((buffer = malloc(block_len * sizeof(char) + sizeof(char))) == NULL){
+        fprintf(stderr, "Error: cannot allocate memory\n");
+        return 1;
+    }
 
     int ret;
-    while ((ret = read(tfd, buffer, BUFFER_SIZE)) != EOF && ret != 0){
-        buffer[ret] = '\0';
-        write(pfd, &buffer, ret);
+    while ((ret = read(tfd, buffer, block_len)) != EOF && ret != 0){
+        *(buffer + block_len) = '\0';
+
+        write(pfd, buffer, ret);
     }
 
     close(tfd);
@@ -88,6 +100,9 @@ int _mkdir(const char *dir){
     int size = 0;
 
     memcpy(buffer, dir, MAX_DIR_LENGTH);
+
+    if(*p == '/')
+        p++;
 
     while(*p != '\0' && size < MAX_DIR_LENGTH + 1){
         if(*p == '/'){

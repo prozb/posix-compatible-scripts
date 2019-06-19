@@ -64,6 +64,9 @@ int main(int argc, char *argv[]){
         return 1;
     }
 
+    ftruncate(pfd, source.st_size);
+    stat(argv[2], &target);
+
     int ret;
     while ((ret = read(tfd, buffer, BUFFER_SIZE)) != EOF && ret != 0){
         buffer[ret] = '\0';
